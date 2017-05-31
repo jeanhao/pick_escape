@@ -12,9 +12,9 @@ import shutil
 FRAME_PER_ACTION = 1  # 每多少帧进行一次行动
 GAMMA = 0.99  # decay rate of past observations
 OBSERVE = 200.  # timesteps to observe before training
-EXPLORE = 50000.  # frames over which to anneal epsilon
-FINAL_EPSILON = 0  # 0.0001  # final value of epsilon
-INITIAL_EPSILON = 0  # 0.005  # starting value of epsilon
+EXPLORE = 100000.  # frames over which to anneal epsilon
+FINAL_EPSILON = 0.0001  # 0.0001  # final value of epsilon
+INITIAL_EPSILON = 0.01  # 0.005  # starting value of epsilon
 REPLAY_MEMORY = 50000  # number of previous transitions to remember
 BATCH_SIZE = 32  # size of minibatch
 UPDATE_TIME = 100
@@ -89,10 +89,10 @@ class BrainDQN:
 		W_conv1 = self.weight_variable([1, 5, 4, 16])
 		b_conv1 = self.bias_variable([16])
 
-		W_conv2 = self.weight_variable([1, 4, 16, 32])
+		W_conv2 = self.weight_variable([1, 2, 16, 32])
 		b_conv2 = self.bias_variable([32])
 
-		W_fc1 = self.weight_variable([288, 512])
+		W_fc1 = self.weight_variable([192, 512])
 		b_fc1 = self.bias_variable([512])
 
 		W_fc2 = self.weight_variable([512, self.actions])
@@ -109,7 +109,7 @@ class BrainDQN:
 		h_conv2 = tf.nn.relu(self.conv2d(h_pool1, W_conv2, (1, 2)) + b_conv2)
 		h_pool2 = self.max_pool_2x2(h_conv2)
 
-		h_pool2_flat = tf.reshape(h_pool2, [-1, 288])
+		h_pool2_flat = tf.reshape(h_pool2, [-1, 192])
 		h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
 
 		# Q Value layer
@@ -156,14 +156,14 @@ class BrainDQN:
 		if self.timeStep % 10000 == 0:
 			self.saver.save(self.session, 'saved_networks/' + 'network' + '-dqn', global_step=self.timeStep)
 
-		if self.timeStep - self.checkpoint_record >= BACKUP_INTERVAL:  # 每隔一定间隔备份网络
-			self.timeStep += BACKUP_INTERVAL
-			copyFiles(self.networks_directory, self.all_networks_directory)
+# 		if self.timeStep - self.checkpoint_record >= BACKUP_INTERVAL:  # 每隔一定间隔备份网络
+# 			self.timeStep += BACKUP_INTERVAL
+# 			copyFiles(self.networks_directory, self.all_networks_directory)
 			# 删除checkpoint文件
 # 			os.remove(self.networks_directory + "/checkpoint")
 
-# 		if self.timeStep % UPDATE_TIME == 0:
-# 			self.copyTargetQNetwork()
+		if self.timeStep % UPDATE_TIME == 0:
+			self.copyTargetQNetwork()
 
 
 	def setPerception(self, nextObservation, action, reward):

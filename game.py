@@ -187,7 +187,7 @@ class GameObject(object):
 
         # 更新速度
         self.update_score_speed()
-        image_data = pygame.surfarray.array3d(pygame.display.get_surface())[:MENU_LINE_X, SCREEN_HEIGHT / 3 * 2:]
+        image_data = pygame.surfarray.array3d(pygame.display.get_surface())[:MENU_LINE_X, SHORT_SCREENT_HEIGHT:]
         self.update_screen()
 
         self.fps_clock.tick(FPS)
